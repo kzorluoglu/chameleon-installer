@@ -1,7 +1,7 @@
 # Chameleon Shop Creator
 
-This tool provides a command-line interface for creating a new Chameleon Shop. It checks system requirements, clones the
-Chameleon system from GitHub, and runs Composer to install dependencies.
+This command-line tool facilitates the creation of a new Chameleon Shop, automating tasks such as system requirement
+checks, cloning from GitHub, and setting up the project with Composer.
 
 ## Requirements
 
@@ -32,9 +32,10 @@ Replace `/path/to/your/new/shop` with the desired directory for your new Chamele
 
 ## Features
 
-* Verifies PHP version and required extensions.
-* Clones the latest version of Chameleon Shop from GitHub.
-* Runs Composer install in the project directory.
+* Checks PHP version and extensions.
+* Clones Chameleon Shop from GitHub.
+* Runs Composer in the project directory.
+* Offers database setup and import options, with flexibility in handling configuration settings.
 
 ## Contributing
 
@@ -47,13 +48,10 @@ This software is open-source, licensed under the MIT license.
 
 ## Development
 
-To locally test Chameleon application installer follow these steps:
+For local testing:
 
-* Install Composer Locally: If not already installed, download and install Composer.
-* Clone Repository: Clone the repository where your installer code is located to your local machine.
-* Install Dependencies: In the root directory of your cloned repository, run `composer install` to install all necessary
-  dependencies.
-* Make the Installer Executable: Ensure the bin/chameleon file is executable. You can use `chmod +x bin/chameleon` on
-  Unix-based systems.
-  *Run the Installer: Execute your installer directly with `./bin/chameleon` followed by any necessary arguments or
-  commands. This allows you to test how it behaves.
+* Install Composer.
+* Clone the repo.
+* Run `composer install`.
+* Make `bin/chameleon` executable (`chmod +x`).
+* Test with `./bin/chameleon`.
