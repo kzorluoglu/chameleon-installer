@@ -17,7 +17,7 @@ Clone this repository and run `composer install` to set up the command.
 You can install the Chameleon Shop Installer globally using Composer:
 
 ```bash
-composer global require your-vendor/chameleon-installer
+composer global require kzorluoglu/chameleon-installer
 ````
 
 # Creating a New Project
