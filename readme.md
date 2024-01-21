@@ -30,7 +30,7 @@ composer global require kzorluoglu/chameleon-installer
 Once installed, you can create a new Chameleon project using:
 
 ```bash
-chameleon create /path/to/your/new/shop
+chameleon create /path/to/your/new/shop 7.2.x # or 7.1.x or master for development
 ````
 
 Replace `/path/to/your/new/shop` with the desired directory for your new Chameleon Shop.
