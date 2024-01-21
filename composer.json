@@ -37,5 +37,10 @@
     "symfony/process": "^6.4",
     "ext-pdo": "*",
     "symfony/yaml": "^6.4"
-  }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

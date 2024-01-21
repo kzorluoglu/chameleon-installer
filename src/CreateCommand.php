@@ -25,8 +25,8 @@ class CreateCommand extends Command
     private const GITHUB_REPO_URL = 'https://github.com/chameleon-system/chameleon-system';
     private const CMS_DEFAULT_LANGUAGE_ID = 24;
     private const LANGUAGE = 'de';
+    const DEFAULT_VERSION = '7.2.x';
     private DatabaseConnectionService $databaseConnectionService;
-    private string $directoryFullPath;
 
     public function __construct()
     {
@@ -39,8 +39,16 @@ class CreateCommand extends Command
             // the command description shown when running "php bin/console list"
             ->setDescription('Creates a Chameleon Shop.')
             ->addArgument('directory', InputArgument::REQUIRED, 'Installation Directory')
+            ->addArgument(
+                'version',
+                InputArgument::OPTIONAL,
+                'The version (branch or tag) of the repository to clone',
+                '7.1.x'
+            )
             // the command help shown when running the command with the "--help" option
-            ->setHelp('This command allows you to create a chameleon: chameleon create /home/www/project ');
+            ->setHelp(
+                'This command allows you to create a chameleon.'.PHP_EOL.'Example Usage:'.PHP_EOL.'chameleon create /home/www/project '
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -54,9 +62,17 @@ class CreateCommand extends Command
         }
 
         $directory = $input->getArgument('directory');
+        $version = $input->getArgument('version') ?? self::DEFAULT_VERSION;
 
         $io->section('Git cloning');
-        if (false === $this->runGitCloneAndSetDirectoryFullPath($directory)) {
+        $output->writeln(
+            sprintf(
+                'New Chameleon Shop <fg=black;bg=cyan>%s</> cloning in to the directory: <fg=black;bg=cyan>%s</>',
+                $version,
+                $directory
+            )
+        );
+        if (false === $this->gitCloneRepository($directory, $version, self::GITHUB_REPO_URL, $io)) {
             return Command::FAILURE;
         }
 
@@ -67,8 +83,10 @@ class CreateCommand extends Command
         }
 
         $io->section('Database Import');
+        $relativePathToParameters = $directory.'/app/config/parameters.yml';
+        $absolutePathToParameters = getcwd().'/'.$relativePathToParameters;
         $this->databaseConnectionService = new DatabaseConnectionService(
-            $this->directoryFullPath.'/app/config/parameters.yml'
+            $absolutePathToParameters
         );
         $importDemoData = $io->confirm('Do you want to import demo data?', false);
         $databaseDump = $this->getDatabaseDump($importDemoData);
@@ -97,7 +115,7 @@ class CreateCommand extends Command
 
             return Command::FAILURE;
         }
-        $io->section('Awesome! Your Chameleon Shop is ready!');
+        $io->success('Awesome! Your Chameleon Shop is ready!');
 
         if ($importDemoData) {
             $io->writeln(
@@ -135,6 +153,8 @@ class CreateCommand extends Command
 
         $io->listing($outputList);
 
+        $io->success("Requirement check completed.");
+
         return true;
     }
 
@@ -143,7 +163,9 @@ class CreateCommand extends Command
         string $directory,
         SymfonyStyle $io
     ): bool {
-        $command = sprintf('cd %s && %s install', $directory, $composerBinaryPath);
+        $command = sprintf('cd %s && %s install', escapeshellarg($directory), escapeshellarg($composerBinaryPath));
+        $io->info($command);
+
         exec($command, $outputLines, $returnVar);
         $io->write($outputLines);
 
@@ -156,12 +178,27 @@ class CreateCommand extends Command
         return true;
     }
 
-    private function runGitCloneAndSetDirectoryFullPath(string $directory): void
+    private function gitCloneRepository(string $directory, string $version, string $repoURL, SymfonyStyle $io): bool
     {
-        exec('git clone '.self::GITHUB_REPO_URL.' '.$directory);
-        exec('cd '.$directory.' && pwd', $output);
+        $command = sprintf(
+            'git clone -b %s %s %s',
+            escapeshellarg($version),
+            $repoURL,
+            escapeshellarg($directory)
+        );
+        $io->info($command);
 
-        $this->setDirectoryFullPath($output[0]); // returns the full path of the cloned directory
+        exec($command, $output, $returnVar);
+
+        if ($returnVar !== 0) {
+            $io->error("Error in git cloning: ".implode("\n", $output));
+
+            return false;
+        }
+
+        $io->success("Cloning completed.");
+
+        return true;
     }
 
     private function getDatabaseDump(bool $importDemoData): string
@@ -173,12 +210,22 @@ class CreateCommand extends Command
         return __DIR__.'/../databasedumps/shop-database.sql';
     }
 
+    private function countSqlStatements(string $filePath): int
+    {
+        $fileContent = file_get_contents($filePath);
+
+        return substr_count($fileContent, ';');
+    }
+
     private function importDatabase(string $filePath, SymfonyStyle $io): bool
     {
         $pdo = $this->databaseConnectionService->createConnection();
         $handle = fopen($filePath, 'r');
+        $totalStatements = $this->countSqlStatements($filePath);
 
-        $io->writeln("Executing queries");
+        $io->info("Database importing..");
+
+        $io->progressStart($totalStatements);
 
         $query = '';
         while (!feof($handle)) {
@@ -188,10 +235,12 @@ class CreateCommand extends Command
             if (str_ends_with(trim($line), ';')) {
                 try {
                     $pdo->exec($query);
+                    $io->progressAdvance();
                 } catch (\PDOException $e) {
                     $io->error("Error executing query: ".$e->getMessage());
 
                     fclose($handle);
+                    $io->progressFinish();
 
                     return false;
                 }
@@ -201,14 +250,10 @@ class CreateCommand extends Command
         }
 
         fclose($handle);
+        $io->progressFinish();
         $io->success("Database import completed.");
 
         return true;
-    }
-
-    private function setDirectoryFullPath(string $directoryFullPath): void
-    {
-        $this->directoryFullPath = $directoryFullPath;
     }
 
     private function findComposer(): string

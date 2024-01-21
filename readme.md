@@ -3,6 +3,11 @@
 This command-line tool facilitates the creation of a new Chameleon Shop, automating tasks such as system requirement
 checks, cloning from GitHub, and setting up the project with Composer.
 
+Usage Animation via [asciinema](![asciinema](https://github.com/asciinema/asciinema)):
+![Alt Text](https://github.com/kzorluoglu/chameleon-installer/blob/main/asciinema-min.gif)
+
+_cast File Converted via https://dstein64.github.io/gifcast/_
+
 ## Requirements
 
 - PHP 8.1 or higher
