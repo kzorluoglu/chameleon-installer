@@ -1,6 +1,6 @@
 {
   "name": "kzorluoglu/chameleon-installer",
-  "description": "Your chameleon shop installer.",
+  "description": "Your Chameleon Shop installer.",
   "keywords": [
     "chameleon shop",
     "chameleon cms",
@@ -33,9 +33,11 @@
   },
   "require": {
     "php": "^8.1",
-    "symfony/console": "^6.4",
-    "symfony/process": "^6.4",
     "ext-pdo": "*",
+    "symfony/config": "^6.4",
+    "symfony/console": "^6.4",
+    "symfony/dependency-injection": "^6.4",
+    "symfony/process": "^6.4",
     "symfony/yaml": "^6.4"
   },
   "config": {

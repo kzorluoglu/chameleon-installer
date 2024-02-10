@@ -1,14 +1,29 @@
 #!/usr/bin/env php
 <?php
 
-if (file_exists(__DIR__ . '/../../../autoload.php')) {
-    require __DIR__ . '/../../../autoload.php';
-} else {
-    require __DIR__ . '/../vendor/autoload.php';
-}
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-$app = new Symfony\Component\Console\Application('Chameleon Installer', '1.0.0');
-// Add your command here
-$app->add(new \KZorluoglu\Installer\Console\CreateCommand());
+require __DIR__.'/../vendor/autoload.php';
 
+// Initialize the DI container
+$containerBuilder = new ContainerBuilder();
+$loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__));
+$loader->load('../config/services.yaml');
+
+// Compile the container to resolve references
+$containerBuilder->compile();
+
+
+$app = new Application('Chameleon Installer', '1.0.0');
+
+// Retrieve the command from the container
+$createCommand = $containerBuilder->get(\KZorluoglu\Installer\Console\CreateCommand::class);
+
+// Add the command to the application
+$app->add($createCommand);
+
+// Run the application
 $app->run();

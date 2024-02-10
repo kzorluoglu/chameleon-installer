@@ -2,14 +2,15 @@
 
 namespace KZorluoglu\Installer\Console;
 
-use KZorluoglu\Installer\Console\Services\DatabaseConnectionService;
 use PDO;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use KZorluoglu\Installer\Console\Services\DatabaseConnectionService;
+use KZorluoglu\Installer\Console\Factory\DatabaseConnectionServiceFactory;
 
 #[AsCommand(
     name: 'create',
@@ -85,9 +86,7 @@ class CreateCommand extends Command
         $io->section('Database Import');
         $relativePathToParameters = $directory.'/app/config/parameters.yml';
         $absolutePathToParameters = getcwd().'/'.$relativePathToParameters;
-        $this->databaseConnectionService = new DatabaseConnectionService(
-            $absolutePathToParameters
-        );
+        $this->databaseConnectionService = DatabaseConnectionServiceFactory::createService($absolutePathToParameters);
         $importDemoData = $io->confirm('Do you want to import demo data?', false);
         $databaseDump = $this->getDatabaseDump($importDemoData);
         if (false === $this->importDatabase($databaseDump, $io)) {

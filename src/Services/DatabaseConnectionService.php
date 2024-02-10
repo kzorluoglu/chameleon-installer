@@ -2,29 +2,28 @@
 
 namespace KZorluoglu\Installer\Console\Services;
 
-use Symfony\Component\Yaml\Yaml;
+use KZorluoglu\Installer\Console\Interfaces\DatabaseConfigurationInterface;
+use PDO;
 
 class DatabaseConnectionService
 {
 
-    private string $configFilePath;
+    private DatabaseConfigurationInterface $config;
 
-    public function __construct(string $configFilePath)
+
+    public function __construct(DatabaseConfigurationInterface $config)
     {
-        $this->configFilePath = $configFilePath;
+        $this->config = $config;
     }
 
-    public function createConnection(): \PDO
+    public function createConnection(): PDO
     {
-        $parameters = Yaml::parse(file_get_contents($this->configFilePath));
-        $parameters = $parameters['parameters'];
-
         $dsn = sprintf(
             'mysql:host=%s;dbname=%s',
-            $parameters['database_host'],
-            $parameters['database_name']
+            $this->config->getHost(),
+            $this->config->getDatabaseName()
         );
 
-        return new \PDO($dsn, $parameters['database_user'], $parameters['database_password']);
+        return new PDO($dsn, $this->config->getUser(), $this->config->getPassword());
     }
 }

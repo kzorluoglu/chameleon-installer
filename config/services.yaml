@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  KZorluoglu\Installer\Console\CreateCommand:
+    public: true # This makes it possible to fetch the service directly
+    tags:
+      - { name: 'console.command' }
