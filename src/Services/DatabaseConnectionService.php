@@ -7,15 +7,19 @@ use Symfony\Component\Yaml\Yaml;
 class DatabaseConnectionService
 {
 
-    private string $configFilePath;
+    private ?string $configFilePath = null;
 
-    public function __construct(string $configFilePath)
+    public function setConfigFilePath(string $configFilePath): void
     {
         $this->configFilePath = $configFilePath;
     }
 
     public function createConnection(): \PDO
     {
+        if (!$this->configFilePath || !file_exists($this->configFilePath)) {
+            throw new \LogicException("Configuration file path is not set or does not exist.");
+        }
+
         $parameters = Yaml::parse(file_get_contents($this->configFilePath));
         $parameters = $parameters['parameters'];
 

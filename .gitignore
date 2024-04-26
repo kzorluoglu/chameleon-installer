@@ -3,3 +3,4 @@ test
 .idea
 
 asciinema.cast
+.phpunit.cache

@@ -1,0 +1,35 @@
+<?php
+
+namespace KZorluoglu\Installer\Console\Tests;
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
+use PHPUnit\Framework\TestCase;
+use KZorluoglu\Installer\Console\CreateCommand;
+
+class CreateCommandTest extends TestCase
+{
+    private $commandTester;
+
+    protected function setUp(): void
+    {
+        $application = new Application();
+        $application->add(new CreateCommand());
+
+        $command = $application->find('create');
+        $this->commandTester = new CommandTester($command);
+    }
+
+    public function testExecute()
+    {
+        // Simulate user input
+        $this->commandTester->execute([
+            'directory' => '/path/to/installation',
+            'version' => '7.1.x',
+        ]);
+
+        // Assert the output contains a specific string
+        $this->assertStringContainsString('Awesome! Your Chameleon Shop is ready!', $this->commandTester->getDisplay());
+        // Add more assertions as needed to cover various scenarios and validations
+    }
+}

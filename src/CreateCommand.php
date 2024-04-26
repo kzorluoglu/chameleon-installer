@@ -28,9 +28,10 @@ class CreateCommand extends Command
     const DEFAULT_VERSION = '7.2.x';
     private DatabaseConnectionService $databaseConnectionService;
 
-    public function __construct()
+    public function __construct(DatabaseConnectionService $databaseConnectionService)
     {
         parent::__construct();
+        $this->databaseConnectionService = $databaseConnectionService;
     }
 
     protected function configure(): void
@@ -85,9 +86,8 @@ class CreateCommand extends Command
         $io->section('Database Import');
         $relativePathToParameters = $directory.'/app/config/parameters.yml';
         $absolutePathToParameters = getcwd().'/'.$relativePathToParameters;
-        $this->databaseConnectionService = new DatabaseConnectionService(
-            $absolutePathToParameters
-        );
+        $this->databaseConnectionService->setConfigFilePath($absolutePathToParameters);
+
         $importDemoData = $io->confirm('Do you want to import demo data?', false);
         $databaseDump = $this->getDatabaseDump($importDemoData);
         if (false === $this->importDatabase($databaseDump, $io)) {
