@@ -77,11 +77,49 @@ class CreateCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->section('Composer install');
-        $composer = $this->findComposer();
-        if (false === $this->runComposerInstall($composer, $directory, $io)) {
+
+        $io->section('Config File Setup');
+        $parametersDistPath = $directory . '/app/config/parameters.yml.dist';
+        $parametersPath = $directory . '/app/config/parameters.yml';
+
+        if (false === file_exists($parametersDistPath)) {
+            $io->error("The file $parametersDistPath does not exist.");
             return Command::FAILURE;
         }
+
+        $parametersContent = file_get_contents($parametersDistPath);
+        if (false === $parametersContent) {
+            $io->error("Could not read the file $parametersDistPath.");
+            return Command::FAILURE;
+        }
+
+        // Parse the .dist file to find the parameters
+        preg_match_all('/^(\s*[^#\s].*?):\s?("[^"]*"|~|[^\s]+)/m', $parametersContent, $matches, PREG_SET_ORDER);
+
+        $parameters = [];
+        foreach ($matches as $match) {
+            $parameter = $match[1];
+            $defaultValue = trim($match[2], '"');
+            $value = $io->ask("Enter the value for $parameter", $defaultValue);
+            $parameters[$parameter] = $value;
+        }
+
+        // Replace the placeholders with the user-provided values
+        foreach ($parameters as $parameter => $value) {
+            $parametersContent = preg_replace(
+                '/^(\s*' . preg_quote($parameter) . ':\s?)("[^"]*"|~|[^\s]+)/m',
+                '$1"' . $value . '"',
+                $parametersContent
+            );
+        }
+
+        if (false === file_put_contents($parametersPath, $parametersContent)) {
+            $io->error("Could not write to the file $parametersPath.");
+            return Command::FAILURE;
+        }
+
+        $io->success("Configuration file created at $parametersPath.");
+
 
         $io->section('Database Import');
         $relativePathToParameters = $directory.'/app/config/parameters.yml';
@@ -93,6 +131,13 @@ class CreateCommand extends Command
         if (false === $this->importDatabase($databaseDump, $io)) {
             return Command::FAILURE;
         }
+
+        $io->section('Composer install');
+        $composer = $this->findComposer();
+        if (false === $this->runComposerInstall($composer, $directory, $io)) {
+            return Command::FAILURE;
+        }
+
 
         $io->section('CMS Admin creating');
 

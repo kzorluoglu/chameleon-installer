@@ -11,7 +11,7 @@ _cast File Converted via https://dstein64.github.io/gifcast/_
 ## Requirements
 
 - PHP 8.1 or higher
-- Required PHP Extensions: curl, mbstring, mysqli, pdo_mysql, zip, tidy
+- Required PHP Extensions: curl, mbstring, mysqli, pdo_mysql, zip, tidy, intl, gd
 
 ## Installation
 

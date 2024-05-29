@@ -9,6 +9,6 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 
 $app = new Symfony\Component\Console\Application('Chameleon Installer', '1.0.0');
 // Add your command here
-$app->add(new \KZorluoglu\Installer\Console\CreateCommand());
+$app->add(new \KZorluoglu\Installer\Console\CreateCommand(new \KZorluoglu\Installer\Console\Services\DatabaseConnectionService()));
 
 $app->run();
