@@ -20,7 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CreateCommand extends Command
 {
 
-    private const REQUIRED_PHP_EXTENSION = ['curl', 'mbstring', 'mysqli', 'pdo_mysql', 'zip', 'tidy'];
+    private const REQUIRED_PHP_EXTENSION = ['curl', 'mbstring', 'mysqli', 'pdo_mysql', 'zip', 'tidy', 'intl', 'gd'];
     private const PHP_8_1_VERSION_ID = 80100;
     private const GITHUB_REPO_URL = 'https://github.com/chameleon-system/chameleon-system';
     private const CMS_DEFAULT_LANGUAGE_ID = 24;
