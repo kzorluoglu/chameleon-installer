@@ -25,6 +25,18 @@ You can install the Chameleon Shop Installer globally using Composer:
 composer global require kzorluoglu/chameleon-installer
 ````
 
+### Ensure the Command is in Your PATH
+
+After installing the Chameleon Installer, ensure the Composer global `bin` directory is in your PATH so the Composer commands can be executed from anywhere.
+
+If it isn't, add the following to your shell configuration file (e.g., `.bashrc` or `.zshrc`):
+
+```bash
+echo 'export PATH="$PATH:$HOME/.config/composer/vendor/bin"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+
 # Creating a New Project
 
 Once installed, you can create a new Chameleon project using:
