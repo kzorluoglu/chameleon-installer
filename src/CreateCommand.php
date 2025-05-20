@@ -122,9 +122,14 @@ class CreateCommand extends Command
 
 
         $io->section('Database Import');
-        $relativePathToParameters = $directory.'/app/config/parameters.yml';
-        $absolutePathToParameters = getcwd().'/'.$relativePathToParameters;
-        $this->databaseConnectionService->setConfigFilePath($absolutePathToParameters);
+        $parametersFile = $directory.'/app/config/parameters.yml';
+        $absoluteParametersFile = realpath($parametersFile);
+        if (false === $absoluteParametersFile) {
+            $io->error("Configuration file not found at $parametersFile.");
+
+            return Command::FAILURE;
+        }
+        $this->databaseConnectionService->setConfigFilePath($absoluteParametersFile);
 
         $importDemoData = $io->confirm('Do you want to import demo data?', false);
         $databaseDump = $this->getDatabaseDump($importDemoData);
