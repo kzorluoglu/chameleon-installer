@@ -20,14 +20,13 @@ class DatabaseConnectionServiceTest extends TestCase
 
 
     /**
-     * @doesNotPerformAssertions
      * @throws Exception
      */
     public function testCreateConnectionInvalidConfig()
     {
         $this->expectException(\LogicException::class);
-        $configFilePath = '/path/does/not/need/to/exist/for/test.yml';
-        $service = $this->createMock(DatabaseConnectionService::class);
+        $configFilePath = '/path/that/does/not/exist.yml';
+        $service = new DatabaseConnectionService();
         $service->setConfigFilePath($configFilePath);
         $service->createConnection();
     }
